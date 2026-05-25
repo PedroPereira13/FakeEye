@@ -1,0 +1,12 @@
+services:
+  cowrie:
+    build: .
+    container_name: fakeeye-cowrie
+    ports:
+      - "2222:22"
+    volumes:
+      - ./logs:/home/cowrie/cowrie/var/log/cowrie
+      - ./data:/home/cowrie/cowrie/var/lib/cowrie
+    environment:
+      - COWRIE_STDOUT=yes
+    restart: unless-stopped
