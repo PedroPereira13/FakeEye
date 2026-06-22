@@ -22,4 +22,4 @@ USER cowrie
 
 EXPOSE 2222
 
-CMD ["cowrie", "start", "-f"]
+CMD ["cowrie", "start"]
