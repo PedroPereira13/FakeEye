@@ -3,7 +3,7 @@ services:
     build: .
     container_name: fakeeye-cowrie
     ports:
-      - "2222:2222"
+      - "22:2222"
 
     volumes:
       - ./etc:/home/cowrie/cowrie/etc
