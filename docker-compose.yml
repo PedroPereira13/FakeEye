@@ -4,9 +4,14 @@ services:
     container_name: fakeeye-cowrie
     ports:
       - "2222:2222"
+
     volumes:
+      - ./etc:/home/cowrie/cowrie/etc
+      - ./honeyfs:/home/cowrie/cowrie/honeyfs
       - ./logs:/home/cowrie/cowrie/var/log/cowrie
       - ./data:/home/cowrie/cowrie/var/lib/cowrie
+
     environment:
       - COWRIE_STDOUT=yes
+
     restart: unless-stopped
