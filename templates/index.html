@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HiVision IP Camera - Login</title>
+<style>
+  /* ===========================================================
+     RESET E VARIÁVEIS DE COR
+     Paleta inspirada em interfaces reais de DVR/NVR de câmeras
+     de segurança: azul petróleo escuro, cinza metálico, verde
+     de status "online".
+  =========================================================== */
+  :root{
+    --bg-dark: #0d1b2a;
+    --bg-darker: #08131d;
+    --panel: #16273b;
+    --panel-light: #1e3552;
+    --border: #2a4463;
+    --text-main: #e6edf3;
+    --text-muted: #8ba3bd;
+    --accent: #3ea6ff;
+    --accent-hover: #58b6ff;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --yellow: #f1c40f;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  body{
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+    background: var(--bg-darker);
+    color: var(--text-main);
+    min-height: 100vh;
+  }
+
+  /* ===========================================================
+     TELA DE LOGIN
+  =========================================================== */
+  #login-screen{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    background: radial-gradient(circle at 50% 20%, #123049 0%, var(--bg-darker) 70%);
+    padding: 20px;
+  }
+
+  .login-box{
+    width:100%;
+    max-width:380px;
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:36px 32px 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    animation: fadeIn .4s ease;
+  }
+
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .brand{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-bottom: 28px;
+  }
+
+  .brand-logo{
+    width:56px; height:56px;
+    border-radius:50%;
+    background: linear-gradient(135deg, var(--accent), #1c5b8a);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:12px;
+    box-shadow: 0 0 20px rgba(62,166,255,0.4);
+  }
+  .brand-logo svg{ width:30px; height:30px; fill:#fff; }
+
+  .brand-name{
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:1px;
+  }
+  .brand-sub{
+    font-size:12px;
+    color:var(--text-muted);
+    margin-top:2px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+  }
+
+  .input-group{
+    position:relative;
+    margin-bottom:18px;
+  }
+  .input-group svg{
+    position:absolute;
+    left:12px; top:50%;
+    transform:translateY(-50%);
+    width:18px; height:18px;
+    fill:var(--text-muted);
+  }
+  .input-group input{
+    width:100%;
+    padding:12px 12px 12px 40px;
+    background: var(--bg-dark);
+    border:1px solid var(--border);
+    border-radius:6px;
+    color:var(--text-main);
+    font-size:14px;
+    outline:none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .input-group input:focus{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(62,166,255,0.15);
+  }
+  .input-group input::placeholder{ color: var(--text-muted); }
+
+  .login-btn{
+    width:100%;
+    padding:12px;
+    background: linear-gradient(135deg, var(--accent), #1c6ba0);
+    border:none;
+    border-radius:6px;
+    color:#fff;
+    font-size:15px;
+    font-weight:600;
+    letter-spacing:.5px;
+    cursor:pointer;
+    transition: transform .15s, box-shadow .15s, opacity .15s;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .login-btn:hover{
+    background: linear-gradient(135deg, var(--accent-hover), #2578ad);
+    box-shadow: 0 4px 14px rgba(62,166,255,0.35);
+    transform: translateY(-1px);
+  }
+  .login-btn:active{ transform: translateY(0); }
+  .login-btn:disabled{ opacity:.7; cursor:not-allowed; transform:none; }
+
+  /* Spinner exibido durante o "loading" de autenticação */
+  .spinner{
+    width:16px; height:16px;
+    border:2px solid rgba(255,255,255,0.4);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation: spin .7s linear infinite;
+    display:none;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .error-msg{
+    display:none;
+    background: rgba(231,76,60,0.12);
+    border:1px solid rgba(231,76,60,0.4);
+    color:#ff8a80;
+    font-size:13px;
+    padding:9px 12px;
+    border-radius:6px;
+    margin-bottom:16px;
+    text-align:center;
+    animation: shake .3s ease;
+  }
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-6px); }
+    75%{ transform: translateX(6px); }
+  }
+
+  .login-footer{
+    margin-top:22px;
+    text-align:center;
+    font-size:11px;
+    color: var(--text-muted);
+    border-top:1px solid var(--border);
+    padding-top:14px;
+    line-height:1.6;
+  }
+
+  /* ===========================================================
+     DASHBOARD DA CÂMERA (pós-login)
+  =========================================================== */
+  #dashboard{
+    display:none;
+    min-height:100vh;
+    grid-template-columns: 220px 1fr;
+    grid-template-rows: 100vh;
+  }
+  #dashboard.active{ display:grid; }
+
+  /* --- Menu lateral --- */
+  .sidebar{
+    background: var(--panel);
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    padding:20px 0;
+  }
+  .sidebar .brand{ flex-direction:row; padding:0 18px 18px; margin-bottom:10px; border-bottom:1px solid var(--border);}
+  .sidebar .brand-logo{ width:36px; height:36px; margin:0 10px 0 0; }
+  .sidebar .brand-logo svg{ width:20px; height:20px; }
+  .sidebar .brand-name{ font-size:16px; }
+  .sidebar .brand-sub{ display:none; }
+
+  .menu{ list-style:none; margin-top:10px; flex:1; }
+  .menu li{
+    display:flex; align-items:center; gap:12px;
+    padding:13px 22px;
+    color:var(--text-muted);
+    cursor:pointer;
+    font-size:14px;
+    border-left:3px solid transparent;
+    transition: background .15s, color .15s;
+  }
+  .menu li svg{ width:18px; height:18px; fill: currentColor; }
+  .menu li:hover{ background: var(--panel-light); color:var(--text-main); }
+  .menu li.active{ background: var(--panel-light); color:var(--accent); border-left-color:var(--accent); }
+
+  .logout-btn{
+    margin:10px 18px 0;
+    padding:11px;
+    background: transparent;
+    border:1px solid var(--border);
+    border-radius:6px;
+    color: var(--red);
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+    transition: background .15s;
+  }
+  .logout-btn:hover{ background: rgba(231,76,60,0.12); }
+
+  /* --- Área principal --- */
+  .main{
+    padding:22px 26px;
+    overflow-y:auto;
+  }
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .topbar h1{ font-size:19px; font-weight:600; }
+  .datetime{
+    font-size:13px;
+    color:var(--text-muted);
+    background: var(--panel);
+    border:1px solid var(--border);
+    padding:8px 14px;
+    border-radius:6px;
+  }
+
+  /* Painel de status (conexão / gravação / movimento) */
+  .status-bar{
+    display:flex; gap:14px; margin-bottom:18px; flex-wrap:wrap;
+  }
+  .status-chip{
+    display:flex; align-items:center; gap:7px;
+    background: var(--panel);
+    border:1px solid var(--border);
+    padding:7px 13px;
+    border-radius:20px;
+    font-size:12px;
+    color: var(--text-muted);
+  }
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+  }
+  .dot.blink{ animation: blink 1.4s infinite; }
+  .dot.red{ background: var(--red); box-shadow:0 0 6px var(--red); }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
+
+  /* Área de vídeo (placeholder animado) */
+  .video-wrap{
+    position:relative;
+    background:#000;
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+    aspect-ratio:16/9;
+    max-width:900px;
+  }
+  .video-fake{
+    width:100%; height:100%;
+    background: repeating-linear-gradient(
+      0deg, #0b0b0b 0px, #101010 2px, #0b0b0b 4px
+    );
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  /* "Ruído" sutil de sinal de câmera */
+  .video-fake::before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.03), transparent 60%);
+    animation: noise 3s infinite alternate;
+  }
+  @keyframes noise{ from{opacity:.6;} to{opacity:1;} }
+
+  .video-fake .cam-icon{
+    width:64px; height:64px;
+    fill: rgba(255,255,255,0.15);
+  }
+
+  .video-overlay-top{
+    position:absolute; top:10px; left:12px; right:12px;
+    display:flex; justify-content:space-between;
+    font-size:12px; color:#eee; text-shadow:0 1px 2px #000;
+    font-family: monospace;
+  }
+  .rec-indicator{
+    display:flex; align-items:center; gap:5px;
+    color:#ff5555;
+  }
+  .rec-indicator .rec-dot{
+    width:8px; height:8px; border-radius:50%; background:#ff2b2b;
+    animation: blink 1s infinite;
+  }
+  .video-overlay-bottom{
+    position:absolute; bottom:10px; left:12px;
+    font-size:11px; color:#bbb; font-family: monospace;
+    text-shadow:0 1px 2px #000;
+  }
+
+  /* Card de informações da câmera */
+  .info-card{
+    margin-top:20px;
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:18px 20px;
+    max-width:900px;
+  }
+  .info-card h3{ font-size:14px; margin-bottom:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;}
+  .info-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+    gap:14px;
+    font-size:13px;
+  }
+  .info-grid div span{ display:block; color:var(--text-muted); font-size:11px; margin-bottom:3px;}
+  .info-grid div strong{ font-weight:600; }
+
+  /* Responsivo */
+  @media (max-width:720px){
+    #dashboard.active{ grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .sidebar{ flex-direction:row; align-items:center; overflow-x:auto; padding:10px; }
+    .sidebar .brand{ border-bottom:none; padding:0 10px; }
+    .menu{ display:flex; flex:none; margin:0; }
+    .menu li{ padding:8px 12px; border-left:none; border-bottom:3px solid transparent; white-space:nowrap;}
+    .menu li.active{ border-left:none; border-bottom-color:var(--accent);}
+    .logout-btn{ margin:0 0 0 8px; white-space:nowrap; }
+    .main{ padding:16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- =====================================================
+     TELA DE LOGIN
+===================================================== -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="brand">
+      <div class="brand-logo">
+        <!-- ícone câmera -->
+        <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+      </div>
+      <div class="brand-name">HiVision</div>
+      <div class="brand-sub">Network Camera</div>
+    </div>
+
+    <div class="error-msg" id="error-msg">Usuário ou senha inválidos.</div>
+
+    <!-- Formulário de login: envia POST para /login (Flask) -->
+    <form id="login-form" method="POST" action="/login">
+      <div class="input-group">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>
+        <input type="text" name="username" id="username" placeholder="Usuário" autocomplete="username" required>
+      </div>
+      <div class="input-group">
+        <svg viewBox="0 0 24 24"><path d="M12 17a2 2 0 0 0 2-2 2 2 0 0 0-2-2 2 2 0 0 0-2 2 2 2 0 0 0 2 2zm6-9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h1V6a5 5 0 0 1 10 0v2h1zm-6-4a3 3 0 0 0-3 3v2h6V6a3 3 0 0 0-3-3z"/></svg>
+        <input type="password" name="password" id="password" placeholder="Senha" autocomplete="current-password" required>
+      </div>
+
+      <button type="submit" class="login-btn" id="login-btn">
+        <span class="spinner" id="login-spinner"></span>
+        <span id="login-btn-text">Entrar</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      HiVision NVR Web Client<br>
+      Firmware V5.4.1 build 210917 · © 2024 HiVision Technologies
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     DASHBOARD (visível após login)
+===================================================== -->
+<div id="dashboard">
+  <!-- Menu lateral -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+      </div>
+      <div class="brand-name">HiVision</div>
+    </div>
+    <ul class="menu">
+      <li class="active" data-view="live">
+        <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+        Live View
+      </li>
+      <li data-view="settings">
+        <svg viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7zm7.4-2.5c.03-.33.06-.66.06-1s-.03-.67-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46a.5.5 0 0 0-.6-.22l-2.49 1a7.3 7.3 0 0 0-1.7-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65c-.63.24-1.2.57-1.7.98l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.64L4.56 11c-.04.33-.07.66-.07 1s.03.67.07 1l-2.11 1.63a.5.5 0 0 0-.12.64l2 3.46c.12.22.39.3.6.22l2.49-1c.5.41 1.07.74 1.7.98l.38 2.65c.05.28.27.42.5.42h4c.23 0 .45-.14.5-.42l.38-2.65c.63-.24 1.2-.57 1.7-.98l2.49 1c.21.08.48 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64L19.4 13z"/></svg>
+        Configurações
+      </li>
+      <li data-view="events">
+        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        Eventos
+      </li>
+    </ul>
+    <button class="logout-btn" id="logout-btn">Sair</button>
+  </div>
+
+  <!-- Área principal -->
+  <div class="main">
+    <div class="topbar">
+      <h1>Live View — Câmera 01</h1>
+      <div class="datetime" id="datetime">--/--/---- --:--:--</div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-chip"><span class="dot"></span> Conexão: Online</div>
+      <div class="status-chip"><span class="dot red blink"></span> Gravação: Ativa</div>
+      <div class="status-chip"><span class="dot" id="motion-dot"></span> Movimento: <span id="motion-text">Nenhum</span></div>
+    </div>
+
+    <div class="video-wrap">
+      <div class="video-fake">
+        <div class="video-overlay-top">
+          <div class="rec-indicator"><span class="rec-dot"></span> REC</div>
+          <div id="video-clock">--:--:--</div>
+        </div>
+        <!-- Ícone central simulando ausência de sinal decorativo -->
+        <svg class="cam-icon" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+        <div class="video-overlay-bottom">CAM01 · 1920x1080 · 25fps</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>Informações do Dispositivo</h3>
+      <div class="info-grid">
+        <div><span>Modelo</span><strong>HiVision HV-2140D</strong></div>
+        <div><span>Firmware</span><strong>V5.4.1 build 210917</strong></div>
+        <div><span>Endereço IP</span><strong id="cam-ip">192.168.1.64</strong></div>
+        <div><span>Uptime</span><strong id="uptime">00:00:00</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===============================================================
+   LÓGICA DE LOGIN
+   O formulário faz POST real para /login (Flask). Aqui só
+   controlamos o efeito visual de "carregando" e a exibição de
+   erro; a validação de credenciais e o registro em log ficam
+   inteiramente no backend (web_server.py).
+=============================================================== */
+const loginForm   = document.getElementById('login-form');
+const loginBtn    = document.getElementById('login-btn');
+const loginSpinner= document.getElementById('login-spinner');
+const loginBtnText= document.getElementById('login-btn-text');
+const errorMsg    = document.getElementById('error-msg');
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault(); // controlamos o envio via fetch para poder mostrar loading/erro sem recarregar a página
+
+  errorMsg.style.display = 'none';
+  loginBtn.disabled = true;
+  loginSpinner.style.display = 'inline-block';
+  loginBtnText.textContent = 'Autenticando...';
+
+  const formData = new FormData(loginForm);
+
+  try {
+    const resp = await fetch('/login', {
+      method: 'POST',
+      body: formData
+    });
+
+    // Espera-se que o Flask responda com JSON: {"success": true/false}
+    // (ver instruções de integração no final)
+    const data = await resp.json();
+
+    // Pequeno delay artificial para parecer uma autenticação real
+    setTimeout(() => {
+      if (data.success) {
+        showDashboard();
+      } else {
+        showError();
+      }
+    }, 600);
+
+  } catch (err) {
+    // Se o backend ainda não implementa JSON, cai aqui — trate no server
+    setTimeout(showError, 600);
+  }
+});
+
+function showError(){
+  loginBtn.disabled = false;
+  loginSpinner.style.display = 'none';
+  loginBtnText.textContent = 'Entrar';
+  errorMsg.style.display = 'block';
+  document.getElementById('password').value = '';
+}
+
+function showDashboard(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').classList.add('active');
+  startClock();
+  simulateMotion();
+}
+
+/* ===============================================================
+   MENU LATERAL — troca de item ativo (visual apenas)
+=============================================================== */
+document.querySelectorAll('.menu li').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.menu li').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+/* Botão "Sair" — volta para a tela de login (poderia chamar /logout) */
+document.getElementById('logout-btn').addEventListener('click', () => {
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('login-screen').style.display = 'flex';
+  loginForm.reset();
+});
+
+/* ===============================================================
+   RELÓGIO / DATA EM TEMPO REAL + UPTIME SIMULADO
+=============================================================== */
+let uptimeSeconds = Math.floor(Math.random() * 200000) + 5000; // uptime "falso" inicial
+
+function pad(n){ return n.toString().padStart(2,'0'); }
+
+function startClock(){
+  updateClock();
+  setInterval(updateClock, 1000);
+}
+
+function updateClock(){
+  const now = new Date();
+  const dateStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()}`;
+  const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  document.getElementById('datetime').textContent = `${dateStr} ${timeStr}`;
+  document.getElementById('video-clock').textContent = timeStr;
+
+  uptimeSeconds++;
+  const h = Math.floor(uptimeSeconds/3600);
+  const m = Math.floor((uptimeSeconds%3600)/60);
+  const s = uptimeSeconds%60;
+  document.getElementById('uptime').textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
+/* ===============================================================
+   SIMULAÇÃO DE DETECÇÃO DE MOVIMENTO
+   Alterna aleatoriamente o indicador para parecer uma câmera real.
+=============================================================== */
+function simulateMotion(){
+  setInterval(() => {
+    const dot  = document.getElementById('motion-dot');
+    const text = document.getElementById('motion-text');
+    const detected = Math.random() < 0.15; // 15% de chance a cada ciclo
+
+    if (detected){
+      dot.classList.add('red','blink');
+      text.textContent = 'Detectado';
+      setTimeout(() => {
+        dot.classList.remove('red','blink');
+        text.textContent = 'Nenhum';
+      }, 2500);
+    }
+  }, 4000);
+}
+</script>
+</body>
+</html>
