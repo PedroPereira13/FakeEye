@@ -1,0 +1,23 @@
+# Logs
+logs/
+*.log
+
+# Dados do Cowrie (sessões SSH)
+data/tty/
+data/downloads/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+*.pyc
+
+# Arquivos temporários
+*.tmp
+*.swp
+*.swo
+*.pid
+
+# IDE
+.vscode/
+.idea/
