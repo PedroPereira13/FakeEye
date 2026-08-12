@@ -1,8 +1,6 @@
-2026-08-04 13:30:15 [INFO] Camera initialized successfully
-2026-08-04 13:30:15 [INFO] RTSP server started on port 554
-2026-08-04 13:30:15 [INFO] Web server started on port 80
-2026-08-04 13:30:20 [INFO] Motion detection enabled
-2026-08-04 13:30:25 [WARN] Network latency detected: 15ms
-2026-08-04 13:30:30 [INFO] User admin logged in via web
-2026-08-04 13:31:00 [INFO] Recording started
-2026-08-04 13:35:00 [INFO] Recording stopped
+2026-08-12 10:30:15 [INFO] Camera initialized successfully
+2026-08-12 10:30:15 [INFO] RTSP server started on port 554
+2026-08-12 10:30:15 [INFO] Web server started on port 80
+2026-08-12 10:30:20 [INFO] Motion detection enabled
+2026-08-12 10:30:25 [WARN] Network latency detected: 15ms
+2026-08-12 10:30:30 [INFO] User admin logged in via web
