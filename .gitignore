@@ -21,3 +21,5 @@ venv/
 # IDE
 .vscode/
 .idea/
+data/fs.pickle
+ngrok-v3-stable-linux-amd64.tgz
