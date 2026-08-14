@@ -5,12 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HiVision IP Camera - Login</title>
 <style>
-  /* ===========================================================
-     RESET E VARIÁVEIS DE COR
-     Paleta inspirada em interfaces reais de DVR/NVR de câmeras
-     de segurança: azul petróleo escuro, cinza metálico, verde
-     de status "online".
-  =========================================================== */
   :root{
     --bg-dark: #0d1b2a;
     --bg-darker: #08131d;
@@ -35,340 +29,253 @@
     min-height: 100vh;
   }
 
-  /* ===========================================================
-     TELA DE LOGIN
-  =========================================================== */
+  /* ===================== LOGIN ===================== */
   #login-screen{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    min-height:100vh;
+    display:flex; align-items:center; justify-content:center; min-height:100vh;
     background: radial-gradient(circle at 50% 20%, #123049 0%, var(--bg-darker) 70%);
     padding: 20px;
   }
-
   .login-box{
-    width:100%;
-    max-width:380px;
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:36px 32px 24px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    width:100%; max-width:380px; background: var(--panel); border:1px solid var(--border);
+    border-radius:10px; padding:36px 32px 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     animation: fadeIn .4s ease;
   }
-
   @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
-
-  .brand{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    margin-bottom: 28px;
-  }
-
+  .brand{ display:flex; flex-direction:column; align-items:center; margin-bottom: 28px; }
   .brand-logo{
-    width:56px; height:56px;
-    border-radius:50%;
+    width:56px; height:56px; border-radius:50%;
     background: linear-gradient(135deg, var(--accent), #1c5b8a);
-    display:flex; align-items:center; justify-content:center;
-    margin-bottom:12px;
+    display:flex; align-items:center; justify-content:center; margin-bottom:12px;
     box-shadow: 0 0 20px rgba(62,166,255,0.4);
   }
   .brand-logo svg{ width:30px; height:30px; fill:#fff; }
+  .brand-name{ font-size:22px; font-weight:700; letter-spacing:1px; }
+  .brand-sub{ font-size:12px; color:var(--text-muted); margin-top:2px; letter-spacing:2px; text-transform:uppercase; }
 
-  .brand-name{
-    font-size:22px;
-    font-weight:700;
-    letter-spacing:1px;
-  }
-  .brand-sub{
-    font-size:12px;
-    color:var(--text-muted);
-    margin-top:2px;
-    letter-spacing:2px;
-    text-transform:uppercase;
-  }
-
-  .input-group{
-    position:relative;
-    margin-bottom:18px;
-  }
-  .input-group svg{
-    position:absolute;
-    left:12px; top:50%;
-    transform:translateY(-50%);
-    width:18px; height:18px;
-    fill:var(--text-muted);
-  }
+  .input-group{ position:relative; margin-bottom:18px; }
+  .input-group svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); width:18px; height:18px; fill:var(--text-muted); }
   .input-group input{
-    width:100%;
-    padding:12px 12px 12px 40px;
-    background: var(--bg-dark);
-    border:1px solid var(--border);
-    border-radius:6px;
-    color:var(--text-main);
-    font-size:14px;
-    outline:none;
+    width:100%; padding:12px 12px 12px 40px; background: var(--bg-dark); border:1px solid var(--border);
+    border-radius:6px; color:var(--text-main); font-size:14px; outline:none;
     transition: border-color .2s, box-shadow .2s;
   }
-  .input-group input:focus{
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(62,166,255,0.15);
-  }
+  .input-group input:focus{ border-color: var(--accent); box-shadow: 0 0 0 3px rgba(62,166,255,0.15); }
   .input-group input::placeholder{ color: var(--text-muted); }
 
   .login-btn{
-    width:100%;
-    padding:12px;
-    background: linear-gradient(135deg, var(--accent), #1c6ba0);
-    border:none;
-    border-radius:6px;
-    color:#fff;
-    font-size:15px;
-    font-weight:600;
-    letter-spacing:.5px;
-    cursor:pointer;
-    transition: transform .15s, box-shadow .15s, opacity .15s;
+    width:100%; padding:12px; background: linear-gradient(135deg, var(--accent), #1c6ba0);
+    border:none; border-radius:6px; color:#fff; font-size:15px; font-weight:600; letter-spacing:.5px;
+    cursor:pointer; transition: transform .15s, box-shadow .15s, opacity .15s;
     display:flex; align-items:center; justify-content:center; gap:8px;
   }
-  .login-btn:hover{
-    background: linear-gradient(135deg, var(--accent-hover), #2578ad);
-    box-shadow: 0 4px 14px rgba(62,166,255,0.35);
-    transform: translateY(-1px);
-  }
+  .login-btn:hover{ background: linear-gradient(135deg, var(--accent-hover), #2578ad); box-shadow: 0 4px 14px rgba(62,166,255,0.35); transform: translateY(-1px); }
   .login-btn:active{ transform: translateY(0); }
   .login-btn:disabled{ opacity:.7; cursor:not-allowed; transform:none; }
 
-  /* Spinner exibido durante o "loading" de autenticação */
   .spinner{
-    width:16px; height:16px;
-    border:2px solid rgba(255,255,255,0.4);
-    border-top-color:#fff;
-    border-radius:50%;
-    animation: spin .7s linear infinite;
-    display:none;
+    width:16px; height:16px; border:2px solid rgba(255,255,255,0.4); border-top-color:#fff;
+    border-radius:50%; animation: spin .7s linear infinite; display:none;
   }
   @keyframes spin{ to{ transform: rotate(360deg); } }
 
   .error-msg{
-    display:none;
-    background: rgba(231,76,60,0.12);
-    border:1px solid rgba(231,76,60,0.4);
-    color:#ff8a80;
-    font-size:13px;
-    padding:9px 12px;
-    border-radius:6px;
-    margin-bottom:16px;
-    text-align:center;
+    display:none; background: rgba(231,76,60,0.12); border:1px solid rgba(231,76,60,0.4); color:#ff8a80;
+    font-size:13px; padding:9px 12px; border-radius:6px; margin-bottom:16px; text-align:center;
     animation: shake .3s ease;
   }
-  @keyframes shake{
-    0%,100%{ transform: translateX(0); }
-    25%{ transform: translateX(-6px); }
-    75%{ transform: translateX(6px); }
-  }
+  @keyframes shake{ 0%,100%{ transform: translateX(0); } 25%{ transform: translateX(-6px); } 75%{ transform: translateX(6px); } }
 
   .login-footer{
-    margin-top:22px;
-    text-align:center;
-    font-size:11px;
-    color: var(--text-muted);
-    border-top:1px solid var(--border);
-    padding-top:14px;
-    line-height:1.6;
+    margin-top:22px; text-align:center; font-size:11px; color: var(--text-muted);
+    border-top:1px solid var(--border); padding-top:14px; line-height:1.6;
   }
 
-  /* ===========================================================
-     DASHBOARD DA CÂMERA (pós-login)
-  =========================================================== */
-  #dashboard{
-    display:none;
-    min-height:100vh;
-    grid-template-columns: 220px 1fr;
-    grid-template-rows: 100vh;
-  }
+  /* ===================== DASHBOARD ===================== */
+  #dashboard{ display:none; min-height:100vh; grid-template-columns: 220px 1fr; grid-template-rows: 100vh; }
   #dashboard.active{ display:grid; }
 
-  /* --- Menu lateral --- */
-  .sidebar{
-    background: var(--panel);
-    border-right:1px solid var(--border);
-    display:flex;
-    flex-direction:column;
-    padding:20px 0;
-  }
+  .sidebar{ background: var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:20px 0; }
   .sidebar .brand{ flex-direction:row; padding:0 18px 18px; margin-bottom:10px; border-bottom:1px solid var(--border);}
   .sidebar .brand-logo{ width:36px; height:36px; margin:0 10px 0 0; }
   .sidebar .brand-logo svg{ width:20px; height:20px; }
   .sidebar .brand-name{ font-size:16px; }
   .sidebar .brand-sub{ display:none; }
 
-  .menu{ list-style:none; margin-top:10px; flex:1; }
+  .menu{ list-style:none; margin-top:10px; }
   .menu li{
-    display:flex; align-items:center; gap:12px;
-    padding:13px 22px;
-    color:var(--text-muted);
-    cursor:pointer;
-    font-size:14px;
-    border-left:3px solid transparent;
-    transition: background .15s, color .15s;
+    display:flex; align-items:center; gap:12px; padding:13px 22px; color:var(--text-muted);
+    cursor:pointer; font-size:14px; border-left:3px solid transparent; transition: background .15s, color .15s;
   }
   .menu li svg{ width:18px; height:18px; fill: currentColor; }
   .menu li:hover{ background: var(--panel-light); color:var(--text-main); }
   .menu li.active{ background: var(--panel-light); color:var(--accent); border-left-color:var(--accent); }
 
+  /* Lista de câmeras na sidebar */
+  .cam-list-title{
+    font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;
+    padding:16px 22px 6px;
+  }
+  .cam-list{ list-style:none; flex:1; overflow-y:auto; }
+  .cam-list li{
+    display:flex; align-items:center; gap:10px; padding:10px 22px; font-size:13px; color:var(--text-muted);
+    cursor:pointer; border-left:3px solid transparent; transition: background .15s, color .15s;
+  }
+  .cam-list li:hover{ background: var(--panel-light); color:var(--text-main); }
+  .cam-list li.active{ background: var(--panel-light); color:var(--accent); border-left-color:var(--accent); }
+  .cam-list li .cam-status-dot{ width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 5px var(--green); flex-shrink:0; }
+  .cam-list li .cam-status-dot.off{ background:#555; box-shadow:none; }
+
   .logout-btn{
-    margin:10px 18px 0;
-    padding:11px;
-    background: transparent;
-    border:1px solid var(--border);
-    border-radius:6px;
-    color: var(--red);
-    cursor:pointer;
-    font-size:13px;
-    font-weight:600;
-    transition: background .15s;
+    margin:10px 18px 0; padding:11px; background: transparent; border:1px solid var(--border); border-radius:6px;
+    color: var(--red); cursor:pointer; font-size:13px; font-weight:600; transition: background .15s;
   }
   .logout-btn:hover{ background: rgba(231,76,60,0.12); }
 
-  /* --- Área principal --- */
-  .main{
-    padding:22px 26px;
-    overflow-y:auto;
-  }
-  .topbar{
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom:18px;
-    flex-wrap:wrap;
-    gap:10px;
-  }
-  .topbar h1{ font-size:19px; font-weight:600; }
-  .datetime{
-    font-size:13px;
-    color:var(--text-muted);
-    background: var(--panel);
-    border:1px solid var(--border);
-    padding:8px 14px;
-    border-radius:6px;
-  }
+  .main{ padding:22px 26px; overflow-y:auto; }
+  .view{ display:none; }
+  .view.active{ display:block; animation: fadeIn .25s ease; }
 
-  /* Painel de status (conexão / gravação / movimento) */
-  .status-bar{
-    display:flex; gap:14px; margin-bottom:18px; flex-wrap:wrap;
+  .topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px; }
+  .topbar h1{ font-size:19px; font-weight:600; }
+  .datetime{ font-size:13px; color:var(--text-muted); background: var(--panel); border:1px solid var(--border); padding:8px 14px; border-radius:6px; }
+
+  /* Alternância Single / Quad view */
+  .view-toggle{ display:flex; gap:6px; }
+  .view-toggle button{
+    background: var(--panel); border:1px solid var(--border); color:var(--text-muted);
+    padding:7px 13px; font-size:12px; border-radius:6px; cursor:pointer; transition: all .15s;
   }
+  .view-toggle button.active{ background: var(--accent); color:#fff; border-color:var(--accent); }
+
+  .status-bar{ display:flex; gap:14px; margin-bottom:18px; flex-wrap:wrap; }
   .status-chip{
-    display:flex; align-items:center; gap:7px;
-    background: var(--panel);
-    border:1px solid var(--border);
-    padding:7px 13px;
-    border-radius:20px;
-    font-size:12px;
-    color: var(--text-muted);
+    display:flex; align-items:center; gap:7px; background: var(--panel); border:1px solid var(--border);
+    padding:7px 13px; border-radius:20px; font-size:12px; color: var(--text-muted);
   }
-  .dot{
-    width:8px; height:8px; border-radius:50%;
-    background: var(--green);
-    box-shadow: 0 0 6px var(--green);
-  }
+  .dot{ width:8px; height:8px; border-radius:50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
   .dot.blink{ animation: blink 1.4s infinite; }
   .dot.red{ background: var(--red); box-shadow:0 0 6px var(--red); }
   @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
 
-  /* Área de vídeo (placeholder animado) */
-  .video-wrap{
-    position:relative;
-    background:#000;
-    border:1px solid var(--border);
-    border-radius:8px;
-    overflow:hidden;
-    aspect-ratio:16/9;
-    max-width:900px;
-  }
-  .video-fake{
-    width:100%; height:100%;
-    background: repeating-linear-gradient(
-      0deg, #0b0b0b 0px, #101010 2px, #0b0b0b 4px
-    );
-    display:flex; align-items:center; justify-content:center;
-    position:relative;
-  }
-  /* "Ruído" sutil de sinal de câmera */
-  .video-fake::before{
-    content:"";
-    position:absolute; inset:0;
-    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.03), transparent 60%);
-    animation: noise 3s infinite alternate;
-  }
-  @keyframes noise{ from{opacity:.6;} to{opacity:1;} }
-
-  .video-fake .cam-icon{
-    width:64px; height:64px;
-    fill: rgba(255,255,255,0.15);
-  }
+  /* --- Player principal (single view) --- */
+  .video-wrap{ position:relative; background:#000; border:1px solid var(--border); border-radius:8px; overflow:hidden; max-width:900px; }
+  .video-wrap canvas{ display:block; width:100%; height:auto; background:#000; }
 
   .video-overlay-top{
-    position:absolute; top:10px; left:12px; right:12px;
-    display:flex; justify-content:space-between;
-    font-size:12px; color:#eee; text-shadow:0 1px 2px #000;
-    font-family: monospace;
+    position:absolute; top:10px; left:12px; right:12px; display:flex; justify-content:space-between;
+    font-size:12px; color:#eee; text-shadow:0 1px 2px #000; font-family: monospace; pointer-events:none;
   }
-  .rec-indicator{
-    display:flex; align-items:center; gap:5px;
-    color:#ff5555;
-  }
-  .rec-indicator .rec-dot{
-    width:8px; height:8px; border-radius:50%; background:#ff2b2b;
-    animation: blink 1s infinite;
-  }
+  .rec-indicator{ display:flex; align-items:center; gap:5px; color:#ff5555; }
+  .rec-indicator .rec-dot{ width:8px; height:8px; border-radius:50%; background:#ff2b2b; animation: blink 1s infinite; }
   .video-overlay-bottom{
-    position:absolute; bottom:10px; left:12px;
-    font-size:11px; color:#bbb; font-family: monospace;
-    text-shadow:0 1px 2px #000;
+    position:absolute; bottom:10px; left:12px; right:12px; display:flex; justify-content:space-between;
+    font-size:11px; color:#bbb; font-family: monospace; text-shadow:0 1px 2px #000; pointer-events:none;
   }
 
-  /* Card de informações da câmera */
-  .info-card{
-    margin-top:20px;
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:18px 20px;
-    max-width:900px;
+  /* --- Grade com as 4 câmeras (quad view) --- */
+  .quad-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap:10px; max-width:900px;
   }
+  .quad-cell{ position:relative; background:#000; border:1px solid var(--border); border-radius:8px; overflow:hidden; cursor:pointer; transition: border-color .15s; }
+  .quad-cell:hover{ border-color: var(--accent); }
+  .quad-cell canvas{ display:block; width:100%; height:auto; background:#000; }
+  .quad-label{
+    position:absolute; top:6px; left:8px; font-size:11px; font-family:monospace; color:#eee;
+    text-shadow:0 1px 2px #000; pointer-events:none; display:flex; align-items:center; gap:5px;
+  }
+  .quad-label .rec-dot{ width:6px; height:6px; border-radius:50%; background:#ff2b2b; animation: blink 1s infinite; }
+
+  .info-card{ margin-top:20px; background: var(--panel); border:1px solid var(--border); border-radius:8px; padding:18px 20px; max-width:900px; }
   .info-card h3{ font-size:14px; margin-bottom:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;}
-  .info-grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
-    gap:14px;
-    font-size:13px;
-  }
+  .info-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:14px; font-size:13px; }
   .info-grid div span{ display:block; color:var(--text-muted); font-size:11px; margin-bottom:3px;}
   .info-grid div strong{ font-weight:600; }
 
-  /* Responsivo */
+  /* ===================== CONFIGURAÇÕES ===================== */
+  .settings-layout{ display:flex; gap:20px; flex-wrap:wrap; max-width:1100px; }
+  .settings-tabs{ display:flex; flex-direction:column; min-width:170px; background: var(--panel); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .settings-tabs button{
+    background:transparent; border:none; text-align:left; padding:12px 16px; color:var(--text-muted);
+    font-size:13px; cursor:pointer; border-left:3px solid transparent; transition: background .15s, color .15s;
+  }
+  .settings-tabs button:hover{ background:var(--panel-light); color:var(--text-main); }
+  .settings-tabs button.active{ background:var(--panel-light); color:var(--accent); border-left-color:var(--accent); font-weight:600; }
+
+  .settings-panel{ flex:1; min-width:280px; background: var(--panel); border:1px solid var(--border); border-radius:8px; padding:20px 22px; }
+  .settings-pane{ display:none; }
+  .settings-pane.active{ display:block; animation: fadeIn .2s ease; }
+  .settings-pane h3{ font-size:15px; margin-bottom:16px; }
+
+  .form-row{ display:flex; flex-wrap:wrap; gap:14px; margin-bottom:14px; }
+  .field{ flex:1; min-width:180px; display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:12px; color:var(--text-muted); }
+  .field input[type=text], .field input[type=number], .field input[type=password], .field select{
+    background: var(--bg-dark); border:1px solid var(--border); border-radius:6px; color:var(--text-main);
+    padding:9px 10px; font-size:13px; outline:none;
+  }
+  .field input:focus, .field select:focus{ border-color: var(--accent); }
+  .checkbox-row{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-main); margin-bottom:12px; }
+  .checkbox-row input{ width:16px; height:16px; accent-color: var(--accent); }
+
+  .save-btn{
+    background: linear-gradient(135deg, var(--accent), #1c6ba0); border:none; color:#fff; font-weight:600;
+    font-size:13px; padding:10px 22px; border-radius:6px; cursor:pointer; margin-top:6px;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .save-btn:hover{ transform: translateY(-1px); box-shadow: 0 4px 14px rgba(62,166,255,0.3); }
+
+  .saved-toast{
+    display:none; margin-top:12px; font-size:12px; color: var(--green);
+    background: rgba(46,204,113,0.12); border:1px solid rgba(46,204,113,0.35); padding:8px 12px; border-radius:6px;
+  }
+
+  .users-table{ width:100%; border-collapse:collapse; font-size:13px; margin-top:6px; }
+  .users-table th, .users-table td{ padding:9px 10px; border-bottom:1px solid var(--border); text-align:left; }
+  .users-table th{ color:var(--text-muted); font-weight:600; font-size:12px; text-transform:uppercase; }
+  .badge{ font-size:11px; padding:2px 8px; border-radius:10px; background: rgba(62,166,255,0.15); color:var(--accent); }
+  .badge.owner{ background: rgba(46,204,113,0.15); color: var(--green); }
+
+  /* Sub-abas de câmera dentro de Configurações (para trocar qual CAM está sendo configurada) */
+  .cam-subtabs{ display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+  .cam-subtabs button{
+    background: var(--bg-dark); border:1px solid var(--border); color:var(--text-muted);
+    padding:6px 12px; font-size:12px; border-radius:16px; cursor:pointer; transition: all .15s;
+  }
+  .cam-subtabs button.active{ background: var(--accent); color:#fff; border-color:var(--accent); }
+
+  .events-table{ width:100%; border-collapse:collapse; font-size:13px; max-width:900px; }
+  .events-table th, .events-table td{ padding:10px; border-bottom:1px solid var(--border); text-align:left; }
+  .events-table th{ color:var(--text-muted); font-weight:600; font-size:12px; text-transform:uppercase; }
+  .ev-tag{ font-size:11px; padding:2px 8px; border-radius:10px; }
+  .ev-tag.motion{ background: rgba(241,196,15,0.15); color: var(--yellow); }
+  .ev-tag.conn{ background: rgba(46,204,113,0.15); color: var(--green); }
+  .ev-tag.system{ background: rgba(62,166,255,0.15); color: var(--accent); }
+
   @media (max-width:720px){
     #dashboard.active{ grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-    .sidebar{ flex-direction:row; align-items:center; overflow-x:auto; padding:10px; }
-    .sidebar .brand{ border-bottom:none; padding:0 10px; }
-    .menu{ display:flex; flex:none; margin:0; }
+    .sidebar{ flex-direction:column; max-height:auto; }
+    .menu{ display:flex; overflow-x:auto; margin:0; }
     .menu li{ padding:8px 12px; border-left:none; border-bottom:3px solid transparent; white-space:nowrap;}
     .menu li.active{ border-left:none; border-bottom-color:var(--accent);}
-    .logout-btn{ margin:0 0 0 8px; white-space:nowrap; }
+    .cam-list{ display:flex; overflow-x:auto; flex:none; }
+    .cam-list li{ border-left:none; border-bottom:3px solid transparent; white-space:nowrap; }
+    .cam-list li.active{ border-left:none; border-bottom-color:var(--accent); }
+    .logout-btn{ margin:8px 12px; }
     .main{ padding:16px; }
+    .quad-grid{ grid-template-columns: 1fr; }
+    .settings-tabs{ flex-direction:row; overflow-x:auto; min-width:0; }
+    .settings-tabs button{ border-left:none; border-bottom:3px solid transparent; white-space:nowrap; }
+    .settings-tabs button.active{ border-left:none; border-bottom-color:var(--accent); }
   }
 </style>
 </head>
 <body>
 
-<!-- =====================================================
-     TELA DE LOGIN
-===================================================== -->
+<!-- ===================== TELA DE LOGIN ===================== -->
 <div id="login-screen">
   <div class="login-box">
     <div class="brand">
       <div class="brand-logo">
-        <!-- ícone câmera -->
         <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
       </div>
       <div class="brand-name">HiVision</div>
@@ -377,7 +284,6 @@
 
     <div class="error-msg" id="error-msg">Usuário ou senha inválidos.</div>
 
-    <!-- Formulário de login: envia POST para /login (Flask) -->
     <form id="login-form" method="POST" action="/login">
       <div class="input-group">
         <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>
@@ -401,11 +307,8 @@
   </div>
 </div>
 
-<!-- =====================================================
-     DASHBOARD (visível após login)
-===================================================== -->
+<!-- ===================== DASHBOARD ===================== -->
 <div id="dashboard">
-  <!-- Menu lateral -->
   <div class="sidebar">
     <div class="brand">
       <div class="brand-logo">
@@ -427,63 +330,254 @@
         Eventos
       </li>
     </ul>
+
+    <div class="cam-list-title">Câmeras</div>
+    <ul class="cam-list" id="cam-list">
+      <!-- Preenchido via JS a partir do array CAMERAS -->
+    </ul>
+
     <button class="logout-btn" id="logout-btn">Sair</button>
   </div>
 
-  <!-- Área principal -->
   <div class="main">
-    <div class="topbar">
-      <h1>Live View — Câmera 01</h1>
-      <div class="datetime" id="datetime">--/--/---- --:--:--</div>
-    </div>
 
-    <div class="status-bar">
-      <div class="status-chip"><span class="dot"></span> Conexão: Online</div>
-      <div class="status-chip"><span class="dot red blink"></span> Gravação: Ativa</div>
-      <div class="status-chip"><span class="dot" id="motion-dot"></span> Movimento: <span id="motion-text">Nenhum</span></div>
-    </div>
+    <!-- ---------- LIVE VIEW ---------- -->
+    <section class="view active" id="view-live">
+      <div class="topbar">
+        <h1 id="live-title">Live View — CAM01 · Entrada</h1>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <div class="view-toggle">
+            <button class="active" id="btn-single-view" onclick="setLiveMode('single')">Único</button>
+            <button id="btn-quad-view" onclick="setLiveMode('quad')">Grade (4)</button>
+          </div>
+          <div class="datetime" id="datetime">--/--/---- --:--:--</div>
+        </div>
+      </div>
 
-    <div class="video-wrap">
-      <div class="video-fake">
+      <div class="status-bar">
+        <div class="status-chip"><span class="dot"></span> Conexão: Online</div>
+        <div class="status-chip"><span class="dot red blink"></span> Gravação: Ativa</div>
+        <div class="status-chip"><span class="dot" id="motion-dot"></span> Movimento: <span id="motion-text">Nenhum</span></div>
+      </div>
+
+      <!-- Player único (uma câmera em destaque) -->
+      <div class="video-wrap" id="single-view-wrap">
+        <canvas id="cam-canvas-main" width="800" height="450"></canvas>
         <div class="video-overlay-top">
           <div class="rec-indicator"><span class="rec-dot"></span> REC</div>
           <div id="video-clock">--:--:--</div>
         </div>
-        <!-- Ícone central simulando ausência de sinal decorativo -->
-        <svg class="cam-icon" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-        <div class="video-overlay-bottom">CAM01 · 1920x1080 · 25fps</div>
+        <div class="video-overlay-bottom">
+          <span id="video-cam-label">CAM01</span>
+          <span>1920x1080 · 25fps</span>
+        </div>
       </div>
-    </div>
 
-    <div class="info-card">
-      <h3>Informações do Dispositivo</h3>
-      <div class="info-grid">
-        <div><span>Modelo</span><strong>HiVision HV-2140D</strong></div>
-        <div><span>Firmware</span><strong>V5.4.1 build 210917</strong></div>
-        <div><span>Endereço IP</span><strong id="cam-ip">192.168.1.64</strong></div>
-        <div><span>Uptime</span><strong id="uptime">00:00:00</strong></div>
+      <!-- Grade com as 4 câmeras simultaneamente, cada uma em loop contínuo -->
+      <div class="quad-grid" id="quad-view-wrap" style="display:none;">
+        <div class="quad-cell" data-cam="0">
+          <canvas class="quad-canvas" width="400" height="225" data-cam="0"></canvas>
+          <div class="quad-label"><span class="rec-dot"></span>CAM01 · Entrada</div>
+        </div>
+        <div class="quad-cell" data-cam="1">
+          <canvas class="quad-canvas" width="400" height="225" data-cam="1"></canvas>
+          <div class="quad-label"><span class="rec-dot"></span>CAM02 · Corredor</div>
+        </div>
+        <div class="quad-cell" data-cam="2">
+          <canvas class="quad-canvas" width="400" height="225" data-cam="2"></canvas>
+          <div class="quad-label"><span class="rec-dot"></span>CAM03 · Garagem</div>
+        </div>
+        <div class="quad-cell" data-cam="3">
+          <canvas class="quad-canvas" width="400" height="225" data-cam="3"></canvas>
+          <div class="quad-label"><span class="rec-dot"></span>CAM04 · Quintal</div>
+        </div>
       </div>
-    </div>
+
+      <div class="info-card">
+        <h3>Informações do Dispositivo</h3>
+        <div class="info-grid">
+          <div><span>Modelo</span><strong id="info-model">HiVision HV-2140D</strong></div>
+          <div><span>Firmware</span><strong>V5.4.1 build 210917</strong></div>
+          <div><span>Endereço IP</span><strong id="cam-ip">192.168.1.64</strong></div>
+          <div><span>Uptime</span><strong id="uptime">00:00:00</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- CONFIGURAÇÕES ---------- -->
+    <section class="view" id="view-settings">
+      <div class="topbar"><h1>Configurações</h1></div>
+
+      <div class="settings-layout">
+        <div class="settings-tabs">
+          <button class="active" data-pane="rede">Rede</button>
+          <button data-pane="video">Vídeo &amp; Imagem</button>
+          <button data-pane="deteccao">Detecção de Movimento</button>
+          <button data-pane="usuarios">Usuários</button>
+          <button data-pane="sistema">Sistema</button>
+        </div>
+
+        <div class="settings-panel">
+
+          <div class="settings-pane active" id="pane-rede">
+            <h3>Configurações de Rede</h3>
+            <div class="cam-subtabs" data-scope="rede">
+              <button class="active" data-cam="0">CAM01</button>
+              <button data-cam="1">CAM02</button>
+              <button data-cam="2">CAM03</button>
+              <button data-cam="3">CAM04</button>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="dhcp-toggle" checked>
+              <label for="dhcp-toggle">Obter endereço IP automaticamente (DHCP)</label>
+            </div>
+            <div class="form-row">
+              <div class="field"><label>Endereço IP</label><input type="text" class="ip-field" value="192.168.1.64" disabled></div>
+              <div class="field"><label>Máscara de Sub-rede</label><input type="text" value="255.255.255.0" disabled></div>
+            </div>
+            <div class="form-row">
+              <div class="field"><label>Gateway Padrão</label><input type="text" value="192.168.1.1" disabled></div>
+              <div class="field"><label>DNS Preferencial</label><input type="text" value="8.8.8.8" disabled></div>
+            </div>
+            <div class="form-row">
+              <div class="field"><label>Porta HTTP</label><input type="number" value="80"></div>
+              <div class="field"><label>Porta RTSP</label><input type="number" value="554"></div>
+              <div class="field"><label>Porta ONVIF</label><input type="number" value="8000"></div>
+            </div>
+            <button class="save-btn" onclick="fakeSave(this)">Salvar</button>
+            <div class="saved-toast">Configurações salvas com sucesso.</div>
+          </div>
+
+          <div class="settings-pane" id="pane-video">
+            <h3>Vídeo &amp; Imagem</h3>
+            <div class="cam-subtabs" data-scope="video">
+              <button class="active" data-cam="0">CAM01</button>
+              <button data-cam="1">CAM02</button>
+              <button data-cam="2">CAM03</button>
+              <button data-cam="3">CAM04</button>
+            </div>
+            <div class="form-row">
+              <div class="field"><label>Resolução</label>
+                <select><option>1920x1080 (Full HD)</option><option>1280x720 (HD)</option><option>640x480</option></select>
+              </div>
+              <div class="field"><label>Taxa de Quadros (FPS)</label>
+                <select><option>25</option><option>20</option><option>15</option><option>10</option></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field"><label>Qualidade de Codificação</label>
+                <select><option>Alta</option><option>Média</option><option>Baixa</option></select>
+              </div>
+              <div class="field"><label>Formato de Compressão</label>
+                <select><option>H.264</option><option>H.265</option><option>MJPEG</option></select>
+              </div>
+            </div>
+            <div class="checkbox-row"><input type="checkbox" checked><label>Correção de imagem noturna (IR-CUT automático)</label></div>
+            <div class="checkbox-row"><input type="checkbox" checked><label>Marca de data/hora sobreposta (OSD)</label></div>
+            <button class="save-btn" onclick="fakeSave(this)">Salvar</button>
+            <div class="saved-toast">Configurações salvas com sucesso.</div>
+          </div>
+
+          <div class="settings-pane" id="pane-deteccao">
+            <h3>Detecção de Movimento</h3>
+            <div class="cam-subtabs" data-scope="deteccao">
+              <button class="active" data-cam="0">CAM01</button>
+              <button data-cam="1">CAM02</button>
+              <button data-cam="2">CAM03</button>
+              <button data-cam="3">CAM04</button>
+            </div>
+            <div class="checkbox-row"><input type="checkbox" id="motion-enable" checked><label for="motion-enable">Ativar detecção de movimento</label></div>
+            <div class="form-row">
+              <div class="field"><label>Sensibilidade (1-100)</label><input type="number" value="65" min="1" max="100"></div>
+              <div class="field"><label>Intervalo entre alertas (s)</label><input type="number" value="10"></div>
+            </div>
+            <div class="checkbox-row"><input type="checkbox" checked><label>Enviar notificação por e-mail</label></div>
+            <div class="checkbox-row"><input type="checkbox"><label>Enviar alerta via FTP</label></div>
+            <div class="checkbox-row"><input type="checkbox" checked><label>Gravar automaticamente ao detectar movimento</label></div>
+            <button class="save-btn" onclick="fakeSave(this)">Salvar</button>
+            <div class="saved-toast">Configurações salvas com sucesso.</div>
+          </div>
+
+          <div class="settings-pane" id="pane-usuarios">
+            <h3>Gerenciamento de Usuários</h3>
+            <table class="users-table">
+              <thead><tr><th>Usuário</th><th>Nível</th><th>Último Acesso</th></tr></thead>
+              <tbody>
+                <tr><td>admin</td><td><span class="badge owner">Administrador</span></td><td id="admin-last-access">--</td></tr>
+                <tr><td>operador</td><td><span class="badge">Operador</span></td><td>12/07/2026 09:14</td></tr>
+                <tr><td>visualizador</td><td><span class="badge">Somente Visualização</span></td><td>03/07/2026 22:41</td></tr>
+              </tbody>
+            </table>
+            <div class="form-row" style="margin-top:18px;">
+              <div class="field"><label>Nova senha do administrador</label><input type="password" placeholder="••••••••"></div>
+              <div class="field"><label>Confirmar senha</label><input type="password" placeholder="••••••••"></div>
+            </div>
+            <button class="save-btn" onclick="fakeSave(this)">Atualizar Senha</button>
+            <div class="saved-toast">Configurações salvas com sucesso.</div>
+          </div>
+
+          <div class="settings-pane" id="pane-sistema">
+            <h3>Sistema</h3>
+            <div class="form-row">
+              <div class="field"><label>Nome do NVR</label><input type="text" value="NVR-PRINCIPAL"></div>
+              <div class="field"><label>Fuso Horário</label>
+                <select><option>(GMT-03:00) Brasília</option><option>(GMT-05:00) New York</option></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field"><label>Versão do Firmware</label><input type="text" value="V5.4.1 build 210917" disabled></div>
+              <div class="field"><label>Número de Série</label><input type="text" value="HV2140D-8827KX01" disabled></div>
+            </div>
+            <div class="checkbox-row"><input type="checkbox" checked><label>Sincronizar horário via NTP</label></div>
+            <button class="save-btn" onclick="fakeSave(this)">Salvar</button>
+            <button class="save-btn" style="background:#5a2a2a; margin-left:8px;" onclick="fakeSave(this)">Reiniciar Dispositivo</button>
+            <div class="saved-toast">Configurações salvas com sucesso.</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- EVENTOS (dados simulados, não os logs reais) ---------- -->
+    <section class="view" id="view-events">
+      <div class="topbar"><h1>Eventos</h1></div>
+      <table class="events-table">
+        <thead><tr><th>Data/Hora</th><th>Câmera</th><th>Tipo</th><th>Descrição</th></tr></thead>
+        <tbody id="events-body"></tbody>
+      </table>
+    </section>
+
   </div>
 </div>
 
 <script>
 /* ===============================================================
-   LÓGICA DE LOGIN
-   O formulário faz POST real para /login (Flask). Aqui só
-   controlamos o efeito visual de "carregando" e a exibição de
-   erro; a validação de credenciais e o registro em log ficam
-   inteiramente no backend (web_server.py).
+   DADOS DAS CÂMERAS
+   Cada câmera tem uma "cena" própria (tom de cor + posição do
+   corredor) para que a grade não pareça o mesmo canal repetido.
 =============================================================== */
-const loginForm   = document.getElementById('login-form');
-const loginBtn    = document.getElementById('login-btn');
-const loginSpinner= document.getElementById('login-spinner');
-const loginBtnText= document.getElementById('login-btn-text');
-const errorMsg    = document.getElementById('error-msg');
+const CAMERAS = [
+  { name: 'CAM01', label: 'Entrada',  ip: '192.168.1.64', hue: 'blue'  },
+  { name: 'CAM02', label: 'Corredor', ip: '192.168.1.65', hue: 'green' },
+  { name: 'CAM03', label: 'Garagem',  ip: '192.168.1.66', hue: 'amber' },
+  { name: 'CAM04', label: 'Quintal',  ip: '192.168.1.67', hue: 'cyan'  },
+];
+
+let currentCamIndex = 0;
+let liveMode = 'single'; // 'single' | 'quad'
+
+/* ===============================================================
+   LOGIN — POST real para /login (Flask). Loading e erro visuais
+   ficam aqui; validação e log ficam no backend.
+=============================================================== */
+const loginForm    = document.getElementById('login-form');
+const loginBtn     = document.getElementById('login-btn');
+const loginSpinner = document.getElementById('login-spinner');
+const loginBtnText = document.getElementById('login-btn-text');
+const errorMsg      = document.getElementById('error-msg');
 
 loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault(); // controlamos o envio via fetch para poder mostrar loading/erro sem recarregar a página
-
+  e.preventDefault();
   errorMsg.style.display = 'none';
   loginBtn.disabled = true;
   loginSpinner.style.display = 'inline-block';
@@ -492,26 +586,10 @@ loginForm.addEventListener('submit', async (e) => {
   const formData = new FormData(loginForm);
 
   try {
-    const resp = await fetch('/login', {
-      method: 'POST',
-      body: formData
-    });
-
-    // Espera-se que o Flask responda com JSON: {"success": true/false}
-    // (ver instruções de integração no final)
+    const resp = await fetch('/login', { method: 'POST', body: formData });
     const data = await resp.json();
-
-    // Pequeno delay artificial para parecer uma autenticação real
-    setTimeout(() => {
-      if (data.success) {
-        showDashboard();
-      } else {
-        showError();
-      }
-    }, 600);
-
+    setTimeout(() => { data.success ? showDashboard() : showError(); }, 600);
   } catch (err) {
-    // Se o backend ainda não implementa JSON, cai aqui — trate no server
     setTimeout(showError, 600);
   }
 });
@@ -527,21 +605,54 @@ function showError(){
 function showDashboard(){
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('dashboard').classList.add('active');
+  buildCamList();
   startClock();
   simulateMotion();
+  startAllVideoFeeds();
+  populateFakeEvents();
+  document.getElementById('admin-last-access').textContent = nowStr();
 }
 
 /* ===============================================================
-   MENU LATERAL — troca de item ativo (visual apenas)
+   NAVEGAÇÃO ENTRE VIEWS (Live View / Configurações / Eventos)
 =============================================================== */
 document.querySelectorAll('.menu li').forEach(item => {
   item.addEventListener('click', () => {
     document.querySelectorAll('.menu li').forEach(i => i.classList.remove('active'));
     item.classList.add('active');
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + item.dataset.view).classList.add('active');
   });
 });
 
-/* Botão "Sair" — volta para a tela de login (poderia chamar /logout) */
+document.querySelectorAll('.settings-tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.settings-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.settings-pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('pane-' + btn.dataset.pane).classList.add('active');
+  });
+});
+
+/* Sub-abas de câmera dentro de cada painel de Configurações (visual apenas) */
+document.querySelectorAll('.cam-subtabs').forEach(group => {
+  group.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cam = CAMERAS[btn.dataset.cam];
+      const ipField = group.closest('.settings-pane').querySelector('.ip-field');
+      if (ipField) ipField.value = cam.ip;
+    });
+  });
+});
+
+function fakeSave(btn){
+  const toast = btn.closest('.settings-pane').querySelector('.saved-toast');
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 2500);
+}
+
 document.getElementById('logout-btn').addEventListener('click', () => {
   document.getElementById('dashboard').classList.remove('active');
   document.getElementById('login-screen').style.display = 'flex';
@@ -549,51 +660,229 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 });
 
 /* ===============================================================
+   LISTA DE CÂMERAS NA SIDEBAR
+=============================================================== */
+function buildCamList(){
+  const ul = document.getElementById('cam-list');
+  ul.innerHTML = '';
+  CAMERAS.forEach((cam, idx) => {
+    const li = document.createElement('li');
+    if (idx === currentCamIndex) li.classList.add('active');
+    li.innerHTML = `<span class="cam-status-dot"></span>${cam.name} · ${cam.label}`;
+    li.addEventListener('click', () => selectCamera(idx));
+    ul.appendChild(li);
+  });
+}
+
+function selectCamera(idx){
+  currentCamIndex = idx;
+  document.querySelectorAll('#cam-list li').forEach((li, i) => li.classList.toggle('active', i === idx));
+  const cam = CAMERAS[idx];
+  document.getElementById('live-title').textContent = `Live View — ${cam.name} · ${cam.label}`;
+  document.getElementById('video-cam-label').textContent = cam.name;
+  document.getElementById('cam-ip').textContent = cam.ip;
+  // Se estiver na view "Live", garante que fica em modo single ao trocar de câmera pela lista
+  if (document.getElementById('view-live').classList.contains('active')) {
+    setLiveMode('single');
+  }
+}
+
+/* ===============================================================
+   ALTERNÂNCIA ÚNICO / GRADE (QUAD VIEW)
+=============================================================== */
+function setLiveMode(mode){
+  liveMode = mode;
+  document.getElementById('btn-single-view').classList.toggle('active', mode === 'single');
+  document.getElementById('btn-quad-view').classList.toggle('active', mode === 'quad');
+  document.getElementById('single-view-wrap').style.display = mode === 'single' ? 'block' : 'none';
+  document.getElementById('quad-view-wrap').style.display = mode === 'quad' ? 'grid' : 'none';
+}
+
+/* ===============================================================
    RELÓGIO / DATA EM TEMPO REAL + UPTIME SIMULADO
 =============================================================== */
-let uptimeSeconds = Math.floor(Math.random() * 200000) + 5000; // uptime "falso" inicial
-
+let uptimeSeconds = Math.floor(Math.random() * 200000) + 5000;
 function pad(n){ return n.toString().padStart(2,'0'); }
-
+function nowStr(){
+  const now = new Date();
+  return `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+}
 function startClock(){
   updateClock();
   setInterval(updateClock, 1000);
 }
-
 function updateClock(){
   const now = new Date();
   const dateStr = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()}`;
   const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-
   document.getElementById('datetime').textContent = `${dateStr} ${timeStr}`;
   document.getElementById('video-clock').textContent = timeStr;
-
   uptimeSeconds++;
-  const h = Math.floor(uptimeSeconds/3600);
-  const m = Math.floor((uptimeSeconds%3600)/60);
-  const s = uptimeSeconds%60;
+  const h = Math.floor(uptimeSeconds/3600), m = Math.floor((uptimeSeconds%3600)/60), s = uptimeSeconds%60;
   document.getElementById('uptime').textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
 /* ===============================================================
    SIMULAÇÃO DE DETECÇÃO DE MOVIMENTO
-   Alterna aleatoriamente o indicador para parecer uma câmera real.
 =============================================================== */
 function simulateMotion(){
   setInterval(() => {
     const dot  = document.getElementById('motion-dot');
     const text = document.getElementById('motion-text');
-    const detected = Math.random() < 0.15; // 15% de chance a cada ciclo
-
-    if (detected){
+    if (Math.random() < 0.15){
       dot.classList.add('red','blink');
       text.textContent = 'Detectado';
-      setTimeout(() => {
-        dot.classList.remove('red','blink');
-        text.textContent = 'Nenhum';
-      }, 2500);
+      setTimeout(() => { dot.classList.remove('red','blink'); text.textContent = 'Nenhum'; }, 2500);
     }
   }, 4000);
+}
+
+/* ===============================================================
+   FEED DE VÍDEO EM LOOP CONTÍNUO (Canvas 2D)
+   Cada câmera roda seu próprio loop de animação via
+   requestAnimationFrame — ou seja, roda indefinidamente enquanto
+   a página estiver aberta, exatamente como um "vídeo em loop",
+   mas gerado 100% no cliente (sem depender de nenhum arquivo de
+   vídeo externo, então funciona em qualquer servidor sem custo
+   de banda extra). Cada câmera tem uma paleta de cor e um timing
+   de silhueta diferentes para não parecerem cópias umas das outras.
+=============================================================== */
+const HUES = {
+  blue:  { base:'#0e1420', floor:'rgba(255,255,255,0.05)' },
+  green: { base:'#0e1f16', floor:'rgba(180,255,200,0.05)' },
+  amber: { base:'#241a0e', floor:'rgba(255,220,150,0.05)' },
+  cyan:  { base:'#0e1f22', floor:'rgba(150,240,255,0.05)' },
+};
+
+function makeCameraFeed(canvas, camConfig){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const palette = HUES[camConfig.hue] || HUES.blue;
+
+  let silhouetteX = -60;
+  let active = false;
+  let timer = 200 + Math.random() * 500; // início dessincronizado entre câmeras
+
+  function drawScene(){
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0, palette.base);
+    grad.addColorStop(1, '#050709');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,W,H);
+
+    ctx.strokeStyle = palette.floor;
+    ctx.lineWidth = 1;
+    for(let i=0;i<6;i++){
+      ctx.beginPath();
+      ctx.moveTo(W/2, H*0.55);
+      ctx.lineTo(i*(W/5), H);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = palette.floor;
+    ctx.fillRect(0, H*0.5, W, 1);
+
+    for(let i=0;i<25;i++){
+      ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.03})`;
+      ctx.fillRect(Math.random()*W, Math.random()*H, 2, 2);
+    }
+
+    const vignette = ctx.createRadialGradient(W/2,H/2,H*0.25,W/2,H/2,H*0.9);
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.55)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0,0,W,H);
+  }
+
+  function drawSilhouette(x){
+    const scale = W/800; // adapta o tamanho da silhueta ao tamanho do canvas (thumbnail vs principal)
+    const groundY = H*0.72;
+    ctx.fillStyle = 'rgba(15,18,24,0.9)';
+    ctx.beginPath();
+    const bw = 20*scale, bh = 55*scale;
+    if (ctx.roundRect){ ctx.roundRect(x-bw/2, groundY-70*scale, bw, bh, 6*scale); }
+    else { ctx.rect(x-bw/2, groundY-70*scale, bw, bh); }
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, groundY-80*scale, 11*scale, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(x, groundY+4*scale, 16*scale, 5*scale, 0, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  function loop(){
+    drawScene();
+    if (timer <= 0) active = true;
+
+    if (active){
+      silhouetteX += 2 + Math.random()*0.6;
+      drawSilhouette(silhouetteX);
+      if (silhouetteX > W + 60){
+        active = false;
+        silhouetteX = -60;
+        timer = 300 + Math.random() * 600; // próxima passagem em ~5-15s
+      }
+    } else {
+      timer--;
+    }
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+function startAllVideoFeeds(){
+  // Player principal (single view) — sempre reflete a câmera selecionada
+  const mainCanvas = document.getElementById('cam-canvas-main');
+  makeCameraFeed(mainCanvas, CAMERAS[currentCamIndex]);
+
+  // As 4 câmeras da grade rodam em paralelo, cada uma com seu loop
+  document.querySelectorAll('.quad-canvas').forEach(canvas => {
+    const idx = parseInt(canvas.dataset.cam, 10);
+    makeCameraFeed(canvas, CAMERAS[idx]);
+  });
+
+  // Clicar numa célula da grade abre aquela câmera em modo único
+  document.querySelectorAll('.quad-cell').forEach(cell => {
+    cell.addEventListener('click', () => {
+      const idx = parseInt(cell.dataset.cam, 10);
+      selectCamera(idx);
+      setLiveMode('single');
+    });
+  });
+}
+
+/* ===============================================================
+   EVENTOS — dados totalmente simulados no cliente (NÃO reflete o
+   log real de tentativas de acesso do honeypot).
+=============================================================== */
+function populateFakeEvents(){
+  const tipos = [
+    {tag:'motion', label:'Movimento', desc:'Movimento detectado'},
+    {tag:'conn',   label:'Conexão',   desc:'Cliente RTSP conectado'},
+    {tag:'system', label:'Sistema',   desc:'Sincronização NTP concluída'},
+    {tag:'conn',   label:'Conexão',   desc:'Sessão HTTP iniciada'},
+    {tag:'system', label:'Sistema',   desc:'Gravação em buffer local reiniciada'},
+  ];
+  const tbody = document.getElementById('events-body');
+  tbody.innerHTML = '';
+  const base = new Date();
+  for (let i = 0; i < 12; i++){
+    const evt = tipos[Math.floor(Math.random()*tipos.length)];
+    const cam = CAMERAS[Math.floor(Math.random()*CAMERAS.length)];
+    const d = new Date(base.getTime() - i * (5 + Math.random()*35) * 60000);
+    const dateStr = `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${dateStr}</td>
+      <td>${cam.name}</td>
+      <td><span class="ev-tag ${evt.tag}">${evt.label}</span></td>
+      <td>${evt.desc}</td>
+    `;
+    tbody.appendChild(tr);
+  }
 }
 </script>
 </body>
