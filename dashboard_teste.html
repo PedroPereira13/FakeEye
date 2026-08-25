@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FakeEye - Painel do Honeypot</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg: #0a0d12;
+        --bg-image-alpha: 0.025;
+        --panel: #11151d;
+        --border: #232a36;
+        --border-soft: #1a212b;
+        --text: #dbe2ea;
+        --text-muted: #67717f;
+        --amber: #e3b341;
+        --danger: #ff6b5e;
+        --success: #3ddc84;
+        --wire: #4d90fe;
+        --shadow: none;
+        --mono: 'IBM Plex Mono', 'Courier New', monospace;
+        --sans: 'Inter', Arial, sans-serif;
+    }
+
+    [data-theme="light"] {
+        --bg: #f3f4f7;
+        --bg-image-alpha: 0.06;
+        --panel: #ffffff;
+        --border: #dde1e8;
+        --border-soft: #e6e9ef;
+        --text: #171b21;
+        --text-muted: #6b7280;
+        --amber: #a86a00;
+        --danger: #d13b2c;
+        --success: #17874a;
+        --wire: #2f5fd6;
+        --shadow: 0 1px 2px rgba(20,25,35,0.04), 0 1px 8px rgba(20,25,35,0.04);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+        font-family: var(--sans);
+        background-color: var(--bg);
+        background-image:
+            linear-gradient(rgba(127,140,160,var(--bg-image-alpha)) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(127,140,160,var(--bg-image-alpha)) 1px, transparent 1px);
+        background-size: 28px 28px;
+        color: var(--text);
+        margin: 0;
+        padding: 16px 14px 48px;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    header.topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 16px;
+        margin-bottom: 18px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+    .brand .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--success);
+        box-shadow: 0 0 0 3px rgba(61,220,132,0.15);
+        flex-shrink: 0;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .brand .dot { animation: pulse 2.4s ease-in-out infinite; }
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.35; }
+    }
+
+    h1 {
+        font-family: var(--mono);
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        margin: 0;
+        color: var(--text);
+        white-space: nowrap;
+    }
+
+    .eyebrow {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .prompt-line {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-muted);
+        display: none;
+    }
+    .prompt-line .path { color: var(--wire); }
+    .prompt-line .cmd { color: var(--amber); }
+
+    .theme-toggle {
+        font-family: var(--mono);
+        font-size: 15px;
+        line-height: 1;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 6px;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    .theme-toggle:focus-visible {
+        outline: 2px solid var(--wire);
+        outline-offset: 2px;
+    }
+    .theme-toggle:active { transform: scale(0.94); }
+
+    .debug, .erro {
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 9px 12px;
+        border-radius: 4px;
+        margin-bottom: 16px;
+        border: 1px solid var(--border-soft);
+        background: var(--panel);
+        color: var(--text-muted);
+        overflow-wrap: anywhere;
+    }
+    .erro {
+        display: none;
+        color: var(--danger);
+        border-color: rgba(255,107,94,0.35);
+        background: rgba(255,107,94,0.08);
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-top: 2px solid var(--border);
+        padding: 14px 14px;
+        border-radius: 6px;
+        position: relative;
+        box-shadow: var(--shadow);
+        min-width: 0;
+    }
+    .card:nth-child(1) { border-top-color: var(--wire); }
+    .card:nth-child(2) { border-top-color: var(--amber); }
+    .card:nth-child(3) { border-top-color: var(--success); }
+    .card:nth-child(4) { border-top-color: var(--danger); }
+
+    .card .num {
+        font-family: var(--mono);
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.1;
+        color: var(--text);
+        overflow-wrap: anywhere;
+    }
+    .card .label {
+        font-family: var(--mono);
+        color: var(--text-muted);
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-top: 5px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        padding: 14px 14px 12px;
+        border-radius: 6px;
+        min-width: 0;
+        box-shadow: var(--shadow);
+    }
+    .panel.wide { grid-column: 1 / -1; }
+
+    .panel h3 {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin: 0 0 12px;
+        padding-bottom: 9px;
+        border-bottom: 1px dashed var(--border-soft);
+    }
+
+    .chart-box { position: relative; height: 200px; }
+    canvas { max-height: 100%; width: 100% !important; }
+
+    .success-panel { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: center; }
+    .success-panel .chart-box { height: 170px; max-width: 220px; margin: 0 auto; width: 100%; }
+    .success-legend { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+    .success-legend div { margin-bottom: 6px; }
+
+    .atualizacao {
+        font-family: var(--mono);
+        color: var(--text-muted);
+        font-size: 10px;
+        text-align: right;
+        margin-top: 16px;
+        letter-spacing: 0.02em;
+    }
+
+    /* Tablet e acima */
+    @media (min-width: 600px) {
+        body { padding: 24px 24px 56px; }
+        .prompt-line { display: block; }
+        h1 { font-size: 19px; }
+        .cards { grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .card .num { font-size: 28px; }
+        .chart-box { height: 220px; }
+    }
+
+    /* Desktop */
+    @media (min-width: 960px) {
+        .grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .success-panel { grid-template-columns: 220px 1fr; gap: 24px; }
+        .success-panel .chart-box { height: 200px; max-width: none; }
+        h1 { font-size: 20px; }
+    }
+</style>
+</head>
+<body data-theme="dark">
+<div class="container">
+    <header class="topbar">
+        <div class="brand">
+            <span class="dot"></span>
+            <div>
+                <div class="eyebrow">FakeEye / Sensor de Honeypot</div>
+                <h1>Painel do Honeypot</h1>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <div class="prompt-line"><span class="path">~/fakeeye</span> <span class="cmd">tail -f</span> stats.json</div>
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema">🌙</button>
+        </div>
+    </header>
+
+    <div id="debug" class="debug">Carregando...</div>
+    <div id="erro" class="erro">Erro ao carregar dados</div>
+
+    <div class="cards" id="cards"></div>
+
+    <div class="grid">
+        <div class="panel"><h3>Top 10 IPs</h3><div class="chart-box"><canvas id="g1"></canvas></div></div>
+        <div class="panel"><h3>Top Credenciais</h3><div class="chart-box"><canvas id="g2"></canvas></div></div>
+        <div class="panel"><h3>Ataques por Hora</h3><div class="chart-box"><canvas id="g4"></canvas></div></div>
+    </div>
+
+    <div class="panel wide">
+        <h3>Taxa de Sucesso</h3>
+        <div class="success-panel">
+            <div class="chart-box"><canvas id="g5"></canvas></div>
+            <div class="success-legend" id="legenda-sucesso"></div>
+        </div>
+    </div>
+
+    <div class="atualizacao" id="atualizacao"></div>
+</div>
+
+<script>
+let charts = {};
+
+// ---------- Tema claro/escuro ----------
+const toggleBtn = document.getElementById('theme-toggle');
+const themeSalvo = localStorage.getItem('fakeeye-theme');
+const temaInicial = themeSalvo || 'dark';
+aplicarTema(temaInicial);
+
+toggleBtn.addEventListener('click', () => {
+    const atual = document.body.getAttribute('data-theme');
+    const novo = atual === 'dark' ? 'light' : 'dark';
+    aplicarTema(novo);
+    localStorage.setItem('fakeeye-theme', novo);
+});
+
+function aplicarTema(tema) {
+    document.body.setAttribute('data-theme', tema);
+    toggleBtn.textContent = tema === 'dark' ? '🌙' : '☀️';
+    atualizarCoresGraficos();
+    if (window.ultimoPayload) renderizarGraficos(window.ultimoPayload);
+}
+
+function corTexto() {
+    return getComputedStyle(document.body).getPropertyValue('--text-muted').trim();
+}
+function corGrid() {
+    const tema = document.body.getAttribute('data-theme');
+    return { color: tema === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)' };
+}
+function atualizarCoresGraficos() {
+    Chart.defaults.font.family = "'IBM Plex Mono', 'Courier New', monospace";
+    Chart.defaults.font.size = 11;
+    Chart.defaults.color = corTexto();
+}
+
+// ---------- Dados ----------
+async function carregar() {
+    try {
+        document.getElementById('debug').textContent = 'Buscando stats.json...';
+        const res = await fetch('stats.json?t=' + Date.now());
+        document.getElementById('debug').textContent = 'Status: ' + res.status;
+
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const d = await res.json();
+        window.ultimoPayload = d;
+        document.getElementById('debug').textContent = 'Dados carregados: ' + d.total_ataques + ' ataques';
+        document.getElementById('erro').style.display = 'none';
+
+        document.getElementById('cards').innerHTML = `
+            <div class="card"><div class="num">${d.total_ataques}</div><div class="label">Total</div></div>
+            <div class="card"><div class="num">${d.ips_unicos}</div><div class="label">IPs Unicos</div></div>
+            <div class="card"><div class="num">${d.sucessos}</div><div class="label">Sucessos</div></div>
+            <div class="card"><div class="num">${d.falhas}</div><div class="label">Falhas</div></div>
+        `;
+        document.getElementById('atualizacao').textContent = 'Atualizado: ' + d.ultima_atualizacao;
+
+        renderizarGraficos(d);
+
+    } catch(e) {
+        document.getElementById('erro').style.display = 'block';
+        document.getElementById('debug').textContent = 'Erro: ' + e.message;
+        console.error(e);
+    }
+}
+
+function renderizarGraficos(d) {
+    const cores = ['#4d90fe','#e3b341','#3ddc84','#ff6b5e','#b389f9','#3ddce0','#f778ba','#ffa657','#8ec9ff','#7ee787'];
+    const grid = corGrid();
+    atualizarCoresGraficos();
+
+    const ips = Object.entries(d.top_ips).slice(0,10);
+    if (charts.g1) charts.g1.destroy();
+    charts.g1 = new Chart(document.getElementById('g1'), {
+        type: 'bar',
+        data: { labels: ips.map(i=>i[0]), datasets: [{ label: 'Ataques', data: ips.map(i=>i[1]), backgroundColor: cores, borderRadius: 3 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid }, y: { grid } } }
+    });
+
+    const creds = Object.entries(d.top_credenciais).slice(0,10);
+    if (charts.g2) charts.g2.destroy();
+    charts.g2 = new Chart(document.getElementById('g2'), {
+        type: 'bar',
+        data: { labels: creds.map(i=>i[0]), datasets: [{ label: 'Ataques', data: creds.map(i=>i[1]), backgroundColor: '#e3b341', borderRadius: 3 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, indexAxis: 'y', scales: { x: { grid }, y: { grid } } }
+    });
+
+    const horas = Object.entries(d.ataques_por_hora);
+    if (charts.g4) charts.g4.destroy();
+    charts.g4 = new Chart(document.getElementById('g4'), {
+        type: 'bar',
+        data: { labels: horas.map(i=>i[0]+'h'), datasets: [{ label: 'Ataques', data: horas.map(i=>i[1]), backgroundColor: '#f778ba', borderRadius: 3 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid }, y: { grid } } }
+    });
+
+    if (charts.g5) charts.g5.destroy();
+    charts.g5 = new Chart(document.getElementById('g5'), {
+        type: 'doughnut',
+        data: { labels: ['Sucesso', 'Falha'], datasets: [{ data: [d.sucessos, d.falhas], backgroundColor: ['#3ddc84', '#ff6b5e'], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '68%' }
+    });
+
+    const total = d.sucessos + d.falhas;
+    const pct = v => total ? ((v/total)*100).toFixed(1) : '0.0';
+    document.getElementById('legenda-sucesso').innerHTML = `
+        <div style="color:#3ddc84">&#9632; Sucesso &mdash; ${d.sucessos} (${pct(d.sucessos)}%)</div>
+        <div style="color:#ff6b5e">&#9632; Falha &mdash; ${d.falhas} (${pct(d.falhas)}%)</div>
+    `;
+}
+
+carregar();
+setInterval(carregar, 60000);
+</script>
+</body>
+</html>
