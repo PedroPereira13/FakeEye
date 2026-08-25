@@ -5,7 +5,7 @@ import os
 from collections import Counter
 from datetime import datetime
 
-pasta_logs = 'logs_vps/arquivo/'
+pasta_logs = 'logs/'
 
 if not os.path.exists(pasta_logs):
     print(f"Pasta nao encontrada: {pasta_logs}")
