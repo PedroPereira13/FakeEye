@@ -280,10 +280,10 @@ docker ps
 
 ## Autor
 
-**Pedro Pereira**
-**Edgar Santori**
-**Lucca Faria**
-**Raphael Eduardo**
+* **Pedro Pereira**
+* **Edgar Santori**
+* **Lucca Faria**
+* **Raphael Eduardo**
 
 
 * Projeto: [https://github.com/PedroPereira13/FakeEye](https://github.com/PedroPereira13/FakeEye)
