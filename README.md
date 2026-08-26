@@ -281,8 +281,11 @@ docker ps
 ## Autor
 
 **Pedro Pereira**
+**Edgar Santori**
+**Lucca Faria**
+**Raphael Eduardo**
 
-* GitHub: [https://github.com/PedroPereira13](https://github.com/PedroPereira13)
+
 * Projeto: [https://github.com/PedroPereira13/FakeEye](https://github.com/PedroPereira13/FakeEye)
 
 ---
