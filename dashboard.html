@@ -232,6 +232,15 @@
         border-bottom: 1px dashed var(--border-soft);
     }
 
+    .panel h3 .dica {
+        text-transform: none;
+        letter-spacing: normal;
+        font-weight: 400;
+        opacity: 0.7;
+        font-size: 10px;
+        float: right;
+    }
+
     .chart-box { position: relative; height: 200px; }
     canvas { max-height: 100%; width: 100% !important; }
 
@@ -248,6 +257,93 @@
         margin-top: 16px;
         letter-spacing: 0.02em;
     }
+
+    /* ---------- Modal de comandos por IP ---------- */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(4,6,10,0.65);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+    .modal-overlay.aberto { display: flex; }
+
+    .modal-box {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        width: 100%;
+        max-width: 640px;
+        max-height: 82vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border-soft);
+        flex-shrink: 0;
+    }
+    .modal-header h3 {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text);
+        overflow-wrap: anywhere;
+    }
+    .modal-header .sub {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-muted);
+        margin-top: 3px;
+    }
+    .modal-close {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        border-radius: 6px;
+        font-size: 16px;
+        line-height: 1;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    .modal-close:hover { color: var(--text); border-color: var(--wire); }
+
+    .modal-body {
+        padding: 6px 16px 16px;
+        overflow-y: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+    }
+
+    .cmd-row {
+        display: flex;
+        gap: 14px;
+        justify-content: space-between;
+        align-items: baseline;
+        border-bottom: 1px solid var(--border-soft);
+        padding: 8px 0;
+    }
+    .cmd-row .cmd-data { color: var(--text-muted); flex-shrink: 0; white-space: nowrap; font-size: 10px; }
+    .cmd-row .cmd-texto { color: var(--wire); word-break: break-all; text-align: right; }
+
+    .modal-estado {
+        color: var(--text-muted);
+        text-align: center;
+        padding: 24px 0;
+        font-size: 12px;
+    }
+    .modal-estado.erro-estado { color: var(--danger); }
 
     /* Tablet e acima */
     @media (min-width: 600px) {
@@ -290,7 +386,7 @@
     <div class="cards" id="cards"></div>
 
     <div class="grid">
-        <div class="panel"><h3>Top 10 IPs</h3><div class="chart-box"><canvas id="g1"></canvas></div></div>
+        <div class="panel"><h3>Top 10 IPs <span class="dica">clique numa barra p/ ver comandos</span></h3><div class="chart-box"><canvas id="g1"></canvas></div></div>
         <div class="panel"><h3>Top Credenciais</h3><div class="chart-box"><canvas id="g2"></canvas></div></div>
         <div class="panel"><h3>Ataques por Hora</h3><div class="chart-box"><canvas id="g4"></canvas></div></div>
     </div>
@@ -306,8 +402,25 @@
     <div class="atualizacao" id="atualizacao"></div>
 </div>
 
+<!-- Modal de comandos por IP -->
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+        <div class="modal-header">
+            <div>
+                <h3 id="modal-titulo">Comandos</h3>
+                <div class="sub" id="modal-subtitulo"></div>
+            </div>
+            <button class="modal-close" id="modal-close" type="button" aria-label="Fechar">✕</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div class="modal-estado">Carregando...</div>
+        </div>
+    </div>
+</div>
+
 <script>
 let charts = {};
+let ultimosIps = []; // guarda os pares [ip, contagem] do grafico g1 na ordem exibida
 
 // ---------- Tema claro/escuro ----------
 const toggleBtn = document.getElementById('theme-toggle');
@@ -378,11 +491,27 @@ function renderizarGraficos(d) {
     atualizarCoresGraficos();
 
     const ips = Object.entries(d.top_ips).slice(0,10);
+    ultimosIps = ips; // usado pelo handler de clique para mapear indice -> IP
+
     if (charts.g1) charts.g1.destroy();
     charts.g1 = new Chart(document.getElementById('g1'), {
         type: 'bar',
         data: { labels: ips.map(i=>i[0]), datasets: [{ label: 'Ataques', data: ips.map(i=>i[1]), backgroundColor: cores, borderRadius: 3 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid }, y: { grid } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { grid }, y: { grid } },
+            onClick: (evt, elements) => {
+                if (!elements.length) return;
+                const idx = elements[0].index; // indice do PONTO clicado (nao do dataset)
+                const ip = ultimosIps[idx] ? ultimosIps[idx][0] : null;
+                if (ip) abrirModalComandos(ip);
+            },
+            onHover: (evt, elements) => {
+                evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+            }
+        }
     });
 
     const creds = Object.entries(d.top_credenciais).slice(0,10);
@@ -415,6 +544,71 @@ function renderizarGraficos(d) {
         <div style="color:#ff6b5e">&#9632; Falha &mdash; ${d.falhas} (${pct(d.falhas)}%)</div>
     `;
 }
+
+// ---------- Modal de comandos por IP ----------
+const modalOverlay = document.getElementById('modal-overlay');
+const modalTitulo = document.getElementById('modal-titulo');
+const modalSubtitulo = document.getElementById('modal-subtitulo');
+const modalBody = document.getElementById('modal-body');
+
+function escapeHtml(str) {
+    // nunca confie em texto vindo dos logs do honeypot: e digitado por atacantes.
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+}
+
+async function abrirModalComandos(ip) {
+    modalTitulo.textContent = 'Comandos de ' + ip;
+    modalSubtitulo.textContent = 'Carregando...';
+    modalBody.innerHTML = '<div class="modal-estado">Buscando comandos...</div>';
+    modalOverlay.classList.add('aberto');
+
+    try {
+        const res = await fetch('/comandos?ip=' + encodeURIComponent(ip) + '&limite=20');
+        if (!res.ok) {
+            const dataErro = await res.json().catch(() => ({}));
+            throw new Error(dataErro.erro || ('HTTP ' + res.status));
+        }
+        const data = await res.json();
+        exibirComandos(data);
+    } catch (e) {
+        modalSubtitulo.textContent = '';
+        modalBody.innerHTML = `<div class="modal-estado erro-estado">Erro ao buscar comandos: ${escapeHtml(e.message)}</div>`;
+        console.error('Erro ao buscar comandos:', e);
+    }
+}
+
+function exibirComandos(data) {
+    modalSubtitulo.textContent = data.total_comandos + ' comando(s) encontrado(s) — exibindo os ' + data.comandos.length + ' mais recentes';
+
+    if (!data.comandos.length) {
+        modalBody.innerHTML = '<div class="modal-estado">Nenhum comando registrado para este IP.</div>';
+        return;
+    }
+
+    let html = '';
+    // mais recentes primeiro
+    for (const cmd of [...data.comandos].reverse()) {
+        html += `<div class="cmd-row">
+            <span class="cmd-data">${escapeHtml(cmd.data)}</span>
+            <span class="cmd-texto">${escapeHtml(cmd.comando)}</span>
+        </div>`;
+    }
+    modalBody.innerHTML = html;
+}
+
+function fecharModal() {
+    modalOverlay.classList.remove('aberto');
+}
+
+document.getElementById('modal-close').addEventListener('click', fecharModal);
+modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) fecharModal();
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalOverlay.classList.contains('aberto')) fecharModal();
+});
 
 carregar();
 setInterval(carregar, 60000);
