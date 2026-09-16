@@ -501,7 +501,7 @@ function renderizarGraficos(d) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: { x: { grid }, y: { grid } },
+            scales: { x: { grid }, y: {type: 'logarithmic'} },
             onClick: (evt, elements) => {
                 if (!elements.length) return;
                 const idx = elements[0].index; // indice do PONTO clicado (nao do dataset)
