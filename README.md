@@ -286,8 +286,6 @@ docker ps
 * **Raphael Eduardo**
 
 
-* Projeto: [https://github.com/PedroPereira13/FakeEye](https://github.com/PedroPereira13/FakeEye)
-
 ---
 
 ## Licença
